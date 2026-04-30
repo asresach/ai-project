@@ -480,7 +480,8 @@ with col1:
             
             # Display waveform using processed data
             if 'processed_waveform' in st.session_state and st.session_state.processed_waveform is not None:
-                st.line_chart(st.session_state.processed_waveform[::100])  # Downsample for performance
+                chart_data = pd.DataFrame(st.session_state.processed_waveform[::100], columns=['Amplitude'])
+                st.line_chart(chart_data)  # Downsample for performance
             else:
                 st.warning("Waveform data not available")
     
@@ -559,7 +560,8 @@ with col1:
             
             # Display waveform using processed data
             if 'sample_waveform' in st.session_state and st.session_state.sample_waveform is not None:
-                st.line_chart(st.session_state.sample_waveform[::100])  # Downsample for performance
+                chart_data = pd.DataFrame(st.session_state.sample_waveform[::100], columns=['Amplitude'])
+                st.line_chart(chart_data)  # Downsample for performance
             else:
                 st.warning("Waveform data not available")
             
@@ -704,7 +706,8 @@ with col1:
         
         # Display waveform using processed data
         if 'processed_waveform' in st.session_state and st.session_state.processed_waveform is not None:
-            st.line_chart(st.session_state.processed_waveform[::100])  # Downsample for performance
+            chart_data = pd.DataFrame(st.session_state.processed_waveform[::100], columns=['Amplitude'])
+            st.line_chart(chart_data)  # Downsample for performance
         else:
             st.warning("Waveform data not available")
         
@@ -785,7 +788,8 @@ with col2:
         # Display waveform
         if waveform_data is not None:
             st.markdown("### 🎵 Audio Waveform")
-            st.line_chart(waveform_data[::100])  # Downsample for performance
+            chart_data = pd.DataFrame(waveform_data[::100], columns=['Amplitude'])
+            st.line_chart(chart_data)  # Downsample for performance
         
         if comparison_mode and len(models) > 1:
             # Show comparison of both models
