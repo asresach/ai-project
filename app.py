@@ -439,39 +439,50 @@ with col1:
         
         # ወደ WAV መቀየር
         if ext in [".mp3", ".mp4"]:
-            audio = AudioSegment.from_file(uploaded_file, format=ext[1:])
-            audio.export("temp.wav", format="wav")
-            file_to_process = "temp.wav"
-            audio_bytes = open("temp.wav", "rb").read()
+            # የፋይሉን ስም እና አይነት እንለይ
+            temp_input = "temp_uploaded_file" + ext
+            with open(temp_input, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            # አሁን temp ፋይሉን እናንብበው
+            try:
+                audio = AudioSegment.from_file(temp_input)
+                # ወደ wav እንቀይረው
+                audio.export("temp.wav", format="wav")
+                audio_bytes = open("temp.wav", "rb").read()
+                st.success("ፋይሉ በተሳካ ሁኔታ ተቀይሯል!")
+                # Clean up temp files
+                os.remove(temp_input)
+                os.remove("temp.wav")
+            except Exception as e:
+                st.error(f"ስህተት ተፈጠረ: {e}. እባክዎ ፋይሉ የተሟላ የድምፅ መረጃ እንዳለው ያረጋግጡ።")
+                audio_bytes = None
         else:
-            file_to_process = uploaded_file
             audio_bytes = uploaded_file.getvalue()
 
-        st.audio(audio_bytes, format="audio/wav")
-        st.info(f"File: {uploaded_file.name}")
-        
-        # Automatically process the uploaded file
-        with st.spinner("Processing uploaded audio..."):
-            features, waveform = get_features_from_audio(audio_bytes)
-            if features is not None:
-                st.session_state.processed_features = features
-                st.session_state.processed_waveform = waveform
-                st.success("Audio processed successfully!")
-                # Clean up temp file if created
-                if os.path.exists("temp.wav"):
-                    os.remove("temp.wav")
+        if audio_bytes is not None:
+            st.audio(audio_bytes, format="audio/wav")
+            st.info(f"File: {uploaded_file.name}")
+            
+            # Automatically process the uploaded file
+            with st.spinner("Processing uploaded audio..."):
+                features, waveform = get_features_from_audio(audio_bytes)
+                if features is not None:
+                    st.session_state.processed_features = features
+                    st.session_state.processed_waveform = waveform
+                    st.success("Audio processed successfully!")
+                else:
+                    st.error("Failed to process uploaded audio")
+            
+            # Waveform Visualization
+            st.markdown("### 🎵 Audio Waveform")
+            st.markdown("*This graph shows your voice's strength and pattern - This graph shows your voice's strength and pattern*")
+            
+            # Display waveform using processed data
+            if 'processed_waveform' in st.session_state and st.session_state.processed_waveform is not None:
+                st.line_chart(st.session_state.processed_waveform[::100])  # Downsample for performance
             else:
-                st.error("Failed to process uploaded audio")
-        
-        # Waveform Visualization
-        st.markdown("### 🎵 Audio Waveform")
-        st.markdown("*This graph shows your voice's strength and pattern - This graph shows your voice's strength and pattern*")
-        
-        # Display waveform using processed data
-        if 'processed_waveform' in st.session_state and st.session_state.processed_waveform is not None:
-            st.line_chart(st.session_state.processed_waveform[::100])  # Downsample for performance
-        else:
-            st.warning("Waveform data not available")
+                st.warning("Waveform data not available")
     
     # Try These Samples Section
     st.markdown("---")
