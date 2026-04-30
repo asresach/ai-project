@@ -17,8 +17,8 @@ def load_and_extract_features(data_path):
         folder_path = os.path.join(data_path, folder_name)
         
         if os.path.isdir(folder_path):
-            # ከአቃፊ ስም ስሜቱን ያውጡ
-            # ለምሳሌ: "OAF_angry" -> "angry"
+            # Extract emotion from folder name
+            # For example: "OAF_angry" -> "angry"
             emotion = folder_name.split('_')[-1].lower()
             # "pleasantsurprise" ወይም "pleasant_surprise" ከሆነ "surprise" ብለን እንይዘው
             if 'surprise' in emotion or 'surprised' in emotion:

@@ -11,7 +11,7 @@ from sklearn.datasets import make_classification
 
 def run_complete_test():
     """
-    ሙሉ ፍተሻን በአንድ ጊዜ ያሂዳል
+    Runs the complete test at once
     """
     print("="*60)
     print("COMPLETE MODEL TEST FOR GROUP 9")

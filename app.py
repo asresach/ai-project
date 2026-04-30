@@ -200,8 +200,8 @@ def plot_waveform(audio_data, sr=None, title="Audio Waveform"):
 
         # Style the plot
         ax.set_title(title, fontsize=14, color='white', fontweight='bold')
-        ax.set_xlabel('ጊዜ (በሰከንድ) - Time (seconds)', fontsize=12, color='white')
-        ax.set_ylabel('ጥንካሬ - Amplitude', fontsize=12, color='white')
+        ax.set_xlabel('Time (seconds)', fontsize=12, color='white')
+        ax.set_ylabel('Amplitude', fontsize=12, color='white')
         ax.tick_params(colors='white')
         ax.grid(True, alpha=0.3)
 
@@ -434,28 +434,28 @@ with col1:
     )
     
     if uploaded_file is not None:
-        # የፋይል አይነት መለየት
+        # File type detection
         ext = os.path.splitext(uploaded_file.name)[1].lower()
         
         # ወደ WAV መቀየር
         if ext in [".mp3", ".mp4"]:
-            # የፋይሉን ስም እና አይነት እንለይ
+            # Save file name and type
             temp_input = "temp_uploaded_file" + ext
             with open(temp_input, "wb") as f:
                 f.write(uploaded_file.getbuffer())
             
-            # አሁን temp ፋይሉን እናንብበው
+            # Now read the temp file
             try:
                 audio = AudioSegment.from_file(temp_input)
                 # ወደ wav እንቀይረው
                 audio.export("temp.wav", format="wav")
                 audio_bytes = open("temp.wav", "rb").read()
-                st.success("ፋይሉ በተሳካ ሁኔታ ተቀይሯል!")
+                st.success("File converted successfully!")
                 # Clean up temp files
                 os.remove(temp_input)
                 os.remove("temp.wav")
             except Exception as e:
-                st.error(f"ስህተት ተፈጠረ: {e}. እባክዎ ፋይሉ የተሟላ የድምፅ መረጃ እንዳለው ያረጋግጡ።")
+                st.error(f"Error occurred: {e}. Please ensure the file contains complete audio data.")
                 audio_bytes = None
         else:
             audio_bytes = uploaded_file.getvalue()
