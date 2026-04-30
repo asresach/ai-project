@@ -428,22 +428,38 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown('<h3 style="color: #FFD93D; text-align: center;">📁 Upload Audio</h3>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader(
-        "Choose an audio file (WAV format)",
-        type=["wav"],
-        help="Upload a clear audio recording of speech"
+        "Choose an audio file",
+        type=["wav", "mp3", "mp4"],
+        help="Upload a clear audio recording of speech (WAV, MP3, or MP4)"
     )
     
     if uploaded_file is not None:
-        st.audio(uploaded_file, format="audio/wav")
+        # የፋይል አይነት መለየት
+        ext = os.path.splitext(uploaded_file.name)[1].lower()
+        
+        # ወደ WAV መቀየር
+        if ext in [".mp3", ".mp4"]:
+            audio = AudioSegment.from_file(uploaded_file, format=ext[1:])
+            audio.export("temp.wav", format="wav")
+            file_to_process = "temp.wav"
+            audio_bytes = open("temp.wav", "rb").read()
+        else:
+            file_to_process = uploaded_file
+            audio_bytes = uploaded_file.getvalue()
+
+        st.audio(audio_bytes, format="audio/wav")
         st.info(f"File: {uploaded_file.name}")
         
         # Automatically process the uploaded file
         with st.spinner("Processing uploaded audio..."):
-            features, waveform = get_features_from_audio(uploaded_file.getvalue())
+            features, waveform = get_features_from_audio(audio_bytes)
             if features is not None:
                 st.session_state.processed_features = features
                 st.session_state.processed_waveform = waveform
                 st.success("Audio processed successfully!")
+                # Clean up temp file if created
+                if os.path.exists("temp.wav"):
+                    os.remove("temp.wav")
             else:
                 st.error("Failed to process uploaded audio")
         
